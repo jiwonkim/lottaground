@@ -9,9 +9,12 @@ $(document).ready(function() {
 
     var mountains = lottaground(
         bgcanvas,
-        {smoothness: 0.08}
+        {smoothness: 0.08, background: '#badbd3', ground: '#e8b1b1'}
     );
-    var ground = lottaground(canvas, {waterlevel: 380});
+    var ground = lottaground(
+        canvas,
+        {waterlevel: 380, ground: '#b04c4c', watercolor: '#b9e4a2'}
+    );
     ground.shift(100);
 
     var ff = false;

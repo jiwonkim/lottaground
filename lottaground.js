@@ -4,10 +4,14 @@ var DEFAULT_SETTINGS = {
     octaves: 32,
     smoothness: 0.05,
     waterlevel: null,
-    watercolor: 'rgba(100, 100, 255, 0.5)'
+    watercolor: null,
+    background: null,
+    ground: null
 }
 
 function lottaground(canvas, settings) {
+    var LINE_WIDTH = 5;
+
     var _width = canvas.width;
     var _height = canvas.height;
     var _context = canvas.getContext('2d');
@@ -30,7 +34,9 @@ function lottaground(canvas, settings) {
             octaves: val.octaves || DEFAULT_SETTINGS.octaves,
             smoothness: val.smoothness || DEFAULT_SETTINGS.smoothness,
             waterlevel: val.waterlevel || DEFAULT_SETTINGS.waterlevel,
-            watercolor: val.watercolor || DEFAULT_SETTINGS.watercolor
+            watercolor: val.watercolor || DEFAULT_SETTINGS.watercolor,
+            background: val.background || DEFAULT_SETTINGS.background,
+            ground: val.ground || DEFAULT_SETTINGS.ground
         }
     }
 
@@ -87,8 +93,12 @@ function lottaground(canvas, settings) {
 
     function _render() {
         _context.clearRect(0, 0, _width, _height);
-        _renderGround();
+        if (_settings.background !== null) {
+            _context.fillStyle = _settings.background;
+            _context.fillRect(0, 0, _width, _height);
+        }
         _renderWater();
+        _renderGround();
     }
 
     function _renderGround() {
@@ -97,7 +107,18 @@ function lottaground(canvas, settings) {
         for (var i = 1; i < _settings.numSamples; i++) {
             _context.lineTo(x(i), y(i));
         }
+        _context.lineWidth = LINE_WIDTH;
         _context.stroke();
+
+        _context.lineTo(_width, _height);
+        _context.lineTo(0, _height);
+        _context.lineTo(0, y(0));
+        _context.closePath();
+
+        if (_settings.ground) {
+            _context.fillStyle = _settings.ground;
+            _context.fill();
+        }
     }
 
     function _renderWater() {
@@ -137,9 +158,11 @@ function lottaground(canvas, settings) {
 
         function _colorWater() {
             _context.closePath();
-            _context.fillStyle = _settings.watercolor;
-            _context.fill();
             _context.stroke();
+            if (_settings.watercolor) {
+                _context.fillStyle = _settings.watercolor;
+                _context.fill();
+            }
             inwater = false;
         }
     }

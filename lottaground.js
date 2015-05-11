@@ -3,28 +3,29 @@ var DEFAULT_SETTINGS = {
     persistence: 0.25,
     octaves: 32,
     smoothness: 0.05,
-    waterlevel: 250
+    waterlevel: 260,
+    watercolor: 'rgba(100, 100, 255, 0.5)'
 }
 
 function lottaground(canvas, settings) {
-    var _settings = _initSettings(settings);
-    var _step = 1 / _settings.numSamples;
     var _width = canvas.width;
     var _height = canvas.height;
     var _context = canvas.getContext('2d');
     var _currentPosition = 0;
+
+    var _settings = _initSettings(settings);
+    var _step = 1 / _settings.numSamples;
     var _heightmap = new Float32Array(_settings.numSamples);
 
     function _initSettings(val) {
-        if (val === undefined) {
-            return DEFAULT_SETTINGS;
-        }
+        val = val || {};
         return {
             numSamples: val.numSamples || DEFAULT_SETTINGS.numSamples,
             persistence: val.persistence || DEFAULT_SETTINGS.persistence,
-            octvaves: val.octaves || DEFAULT_SETTINGS.octaves,
+            octaves: val.octaves || DEFAULT_SETTINGS.octaves,
             smoothness: val.smoothness || DEFAULT_SETTINGS.smoothness,
-            waterlevel: val.waterlevel || DEFAULT_SETTINGS.waterlevel
+            waterlevel: val.waterlevel || DEFAULT_SETTINGS.waterlevel,
+            watercolor: val.watercolor || DEFAULT_SETTINGS.watercolor
         }
     }
 
@@ -117,24 +118,23 @@ function lottaground(canvas, settings) {
             }
             if (inwater) {
                 if (_y <= _settings.waterlevel) {
-                    //_context.lineTo(x(startIdx), y(startIdx));
-                    _context.closePath();
-                    _context.fillStyle = 'blue';
-                    _context.fill();
-                    inwater = false;
+                    _colorWater();
 
                 } else if (i === _settings.numSamples - 1) {
                     var endIdx = _settings.numSamples - 1;
                     _context.lineTo(x(endIdx), _settings.waterlevel);
-                    //_context.lineTo(x(startIdx), y(startIdx));
-                    _context.closePath();
-                    _context.fillStyle = 'blue';
-                    _context.fill();
-                    inwater = false;
+                    _colorWater();
                 }
             }
         }
-        _context.stroke();
+
+        function _colorWater() {
+            _context.closePath();
+            _context.fillStyle = _settings.watercolor;
+            _context.fill();
+            _context.stroke();
+            inwater = false;
+        }
     }
 
     function _move(delta) {

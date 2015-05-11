@@ -15,7 +15,10 @@ function lottaground(canvas, settings) {
 
     var _settings = _initSettings(settings);
     var _step = 1 / _settings.numSamples;
-    var _heightmap = new Float32Array(_settings.numSamples);
+    var _heightmap = [];
+
+    // init
+    _make(0, _settings.numSamples - 1);
 
     function _initSettings(val) {
         val = val || {};
@@ -72,17 +75,16 @@ function lottaground(canvas, settings) {
         return total;
     }
 
-    function _make() {
-        var currPos = _currentPosition / _settings.smoothness;
-        for (var i = 0; i < _settings.numSamples; i++) {
-            var pos = currPos + i * _step / _settings.smoothness;
-            _heightmap[i] = _perlinNoise(pos);
+    function _make(startIdx, endIdx) {
+        for (var i = startIdx; i <= endIdx; i++) {
+            var pos = (_currentPosition + i * _step) / _settings.smoothness;
+            _heightmap.splice(i, 0, _perlinNoise(pos));
+            console.log("replacing ", i, pos);
         }
     }
 
     function _render() {
         _context.clearRect(0, 0, _width, _height);
-
         _renderGround();
         _renderWater();
     }
@@ -139,7 +141,21 @@ function lottaground(canvas, settings) {
 
     function _move(delta) {
         _currentPosition += delta;
-        _make();
+        console.log(_currentPosition);
+
+        var numRemoved = Math.floor(Math.abs(delta) * _settings.numSamples);
+        var startIdx, endIdx;
+        if (delta > 0) {
+            _heightmap.splice(0, numRemoved);
+            startIdx = _settings.numSamples - numRemoved;
+            endIdx = _settings.numSamples - 1;
+        } else {
+            _heightmap.splice(_settings.numSamples - numRemoved, numRemoved);
+            startIdx = 0;
+            endIdx = numRemoved - 1;
+        }
+        console.log(startIdx, endIdx);
+        _make(startIdx, endIdx);
         _render();
     }
 

@@ -4,9 +4,15 @@
 <script src="jquery-1.11.2.min.js"></script>
 <script>
 $(document).ready(function() {
+    var bgcanvas = document.getElementById('bg-canvas');
     var canvas = document.getElementById('lottaground-canvas');
 
-    var ground = lottaground(canvas);
+    var mountains = lottaground(
+        bgcanvas,
+        {smoothness: 0.08}
+    );
+    var ground = lottaground(canvas, {waterlevel: 380});
+    ground.shift(100);
 
     var ff = false;
     var rw = false;
@@ -31,16 +37,26 @@ $(document).ready(function() {
     requestAnimationFrame(frame);
     function frame() {
         if (ff) {
-            ground.fastforward();
+            mountains.fastforward(0.001);
+            ground.fastforward(0.01);
         } else if (rw) {
-            ground.rewind();
+            mountains.rewind(0.001);
+            ground.rewind(0.01);
         }
         requestAnimationFrame(frame);
     }
 });
 </script>
+<style>
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</style>
 </head>
 <body>
+<canvas id="bg-canvas" width="1000" height="500"></canvas>
 <canvas id="lottaground-canvas" width="1000" height="500"></canvas>
 </body>
 </html>

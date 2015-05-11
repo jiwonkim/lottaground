@@ -3,7 +3,7 @@ var DEFAULT_SETTINGS = {
     persistence: 0.25,
     octaves: 32,
     smoothness: 0.05,
-    waterlevel: 260,
+    waterlevel: null,
     watercolor: 'rgba(100, 100, 255, 0.5)'
 }
 
@@ -16,6 +16,8 @@ function lottaground(canvas, settings) {
     var _settings = _initSettings(settings);
     var _step = 1 / _settings.numSamples;
     var _heightmap = [];
+
+    var _yshift = 0;
 
     // init
     _make(0, _settings.numSamples - 1);
@@ -99,6 +101,9 @@ function lottaground(canvas, settings) {
     }
 
     function _renderWater() {
+        if (_settings.waterlevel === null) {
+            return;
+        }
         var inwater = false;
         var startIdx = 0;
         for (var i = 0; i < _settings.numSamples; i++) {
@@ -173,12 +178,16 @@ function lottaground(canvas, settings) {
         _settings.smoothness /= (2 || denom);
     }
 
+    function shift(val) {
+        _yshift = val;
+    }
+
     function x(i) {
         return i * _step * _width;
     }
 
     function y(i) {
-        return (_heightmap[i] + 1) * 0.5 * _height;
+        return (_heightmap[i] + 1) * 0.5 * _height + _yshift;
     }
 
     return {
@@ -186,6 +195,7 @@ function lottaground(canvas, settings) {
         fastforward: fastforward,
         rewind: rewind,
         roughen: roughen,
+        shift: shift,
 
         // getters
         x: x,

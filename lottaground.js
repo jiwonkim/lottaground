@@ -153,6 +153,10 @@ function lottaground(canvas, settings) {
         _move(-(speed || _step));
     }
 
+    function roughen(denom) {
+        _settings.smoothness /= (2 || denom);
+    }
+
     function x(i) {
         return i * _step * _width;
     }
@@ -165,6 +169,7 @@ function lottaground(canvas, settings) {
         // actions
         fastforward: fastforward,
         rewind: rewind,
+        roughen: roughen,
 
         // getters
         x: x,

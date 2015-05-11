@@ -18,6 +18,8 @@ $(document).ready(function() {
             } else if (evt.which === 37) {
                 ff = false;
                 rw = true;
+            } else if (evt.which === 82) { // 'r'
+                ground.roughen();
             }
         })
         .keyup(function(evt) {

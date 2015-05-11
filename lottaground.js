@@ -1,9 +1,9 @@
 var DEFAULT_SETTINGS = {
-    numSamples: 100,
+    numSamples: 1000,
     persistence: 0.25,
     octaves: 32,
     smoothness: 0.05,
-    waterlevel: 0.5
+    waterlevel: 250
 }
 
 function lottaground(canvas, settings) {
@@ -80,13 +80,59 @@ function lottaground(canvas, settings) {
     }
 
     function _render() {
-        //console.log(_heightmap);
         _context.clearRect(0, 0, _width, _height);
 
+        _renderGround();
+        _renderWater();
+    }
+
+    function _renderGround() {
         _context.beginPath();
         _context.moveTo(0, y(0));
         for (var i = 1; i < _settings.numSamples; i++) {
             _context.lineTo(x(i), y(i));
+        }
+        _context.stroke();
+    }
+
+    function _renderWater() {
+        var inwater = false;
+        var startIdx = 0;
+        for (var i = 0; i < _settings.numSamples; i++) {
+            var _y = y(i);
+            if (_y > _settings.waterlevel) {
+                if (inwater) {
+                    _context.lineTo(x(i), _y);
+                } else {
+                    _context.beginPath();
+                    if (i === 0) {
+                        _context.moveTo(x(i), _settings.waterlevel);
+                        _context.lineTo(x(i), _y);
+                    } else {
+                        _context.moveTo(x(i), _y);
+                    } 
+                    inwater = true;
+                    startIdx = i;
+                }
+            }
+            if (inwater) {
+                if (_y <= _settings.waterlevel) {
+                    //_context.lineTo(x(startIdx), y(startIdx));
+                    _context.closePath();
+                    _context.fillStyle = 'blue';
+                    _context.fill();
+                    inwater = false;
+
+                } else if (i === _settings.numSamples - 1) {
+                    var endIdx = _settings.numSamples - 1;
+                    _context.lineTo(x(endIdx), _settings.waterlevel);
+                    //_context.lineTo(x(startIdx), y(startIdx));
+                    _context.closePath();
+                    _context.fillStyle = 'blue';
+                    _context.fill();
+                    inwater = false;
+                }
+            }
         }
         _context.stroke();
     }

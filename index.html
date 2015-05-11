@@ -4,12 +4,41 @@
 <script src="jquery-1.11.2.min.js"></script>
 <script>
 $(document).ready(function() {
-    var ground = lottaground();
-    ground.fastforward();
-    ground.rewind();
+    var canvas = document.getElementById('lottaground-canvas');
+
+    var ground = lottaground(canvas);
+
+    var ff = false;
+    var rw = false;
+    $(document)
+        .keydown(function(evt) {
+            if (evt.which === 39) { // right arrow
+                ff = true;
+                rw = false;
+            } else if (evt.which === 37) {
+                ff = false;
+                rw = true;
+            }
+        })
+        .keyup(function(evt) {
+            if (evt.which === 39 ||evt.which === 37) {
+                ff = rw = false;
+            }
+        });
+
+    requestAnimationFrame(frame);
+    function frame() {
+        if (ff) {
+            ground.fastforward();
+        } else if (rw) {
+            ground.rewind();
+        }
+        requestAnimationFrame(frame);
+    }
 });
 </script>
 </head>
 <body>
+<canvas id="lottaground-canvas" width="1000" height="500"></canvas>
 </body>
 </html>

@@ -1,18 +1,32 @@
+var DEFAULT_SETTINGS = {
+    numSamples: 100,
+    persistence: 0.25,
+    octaves: 32,
+    smoothness: 0.05,
+    waterlevel: 0.5
+}
+
 function lottaground(canvas, settings) {
-    /** Constants **/
-    var PERSISTENCE = 0.25;
-    var NUM_OCTAVES = 32;
-    var SMOOTHNESS = 0.06;
-
-    var NUM_SAMPLES = 100;
-    var STEP = 1 / NUM_SAMPLES;
-
-    /** Variables **/
+    var _settings = _initSettings(settings);
+    var _step = 1 / _settings.numSamples;
     var _width = canvas.width;
     var _height = canvas.height;
     var _context = canvas.getContext('2d');
     var _currentPosition = 0;
-    var _heightmap = new Float32Array(NUM_SAMPLES);
+    var _heightmap = new Float32Array(_settings.numSamples);
+
+    function _initSettings(val) {
+        if (val === undefined) {
+            return DEFAULT_SETTINGS;
+        }
+        return {
+            numSamples: val.numSamples || DEFAULT_SETTINGS.numSamples,
+            persistence: val.persistence || DEFAULT_SETTINGS.persistence,
+            octvaves: val.octaves || DEFAULT_SETTINGS.octaves,
+            smoothness: val.smoothness || DEFAULT_SETTINGS.smoothness,
+            waterlevel: val.waterlevel || DEFAULT_SETTINGS.waterlevel
+        }
+    }
 
     /**
      * Following methods implement the perlin noise function in 1 dimension.
@@ -48,19 +62,19 @@ function lottaground(canvas, settings) {
     function _perlinNoise(x) {
         var total = 0;
         var frequency = 1;
-        var amplitude = PERSISTENCE;
-        for (var i = 0; i < NUM_OCTAVES; i++) {
+        var amplitude = _settings.persistence;
+        for (var i = 0; i < _settings.octaves; i++) {
             total += _interpolatedNoise(x * frequency) * amplitude;
             frequency *= 2;
-            amplitude *= PERSISTENCE;
+            amplitude *= _settings.persistence;
         }
         return total;
     }
 
     function _make() {
-        var currPos = _currentPosition / SMOOTHNESS;
-        for (var i = 0; i < NUM_SAMPLES; i++) {
-            var pos = currPos + i * STEP / SMOOTHNESS;
+        var currPos = _currentPosition / _settings.smoothness;
+        for (var i = 0; i < _settings.numSamples; i++) {
+            var pos = currPos + i * _step / _settings.smoothness;
             _heightmap[i] = _perlinNoise(pos);
         }
     }
@@ -71,7 +85,7 @@ function lottaground(canvas, settings) {
 
         _context.beginPath();
         _context.moveTo(0, y(0));
-        for (var i = 1; i < NUM_SAMPLES; i++) {
+        for (var i = 1; i < _settings.numSamples; i++) {
             _context.lineTo(x(i), y(i));
         }
         _context.stroke();
@@ -86,15 +100,15 @@ function lottaground(canvas, settings) {
     /** Public Methods **/
 
     function fastforward(speed) {
-        _move(speed || STEP);
+        _move(speed || _step);
     }
 
     function rewind(speed) {
-        _move(-(speed || STEP));
+        _move(-(speed || _step));
     }
 
     function x(i) {
-        return i * STEP * _width;
+        return i * _step * _width;
     }
 
     function y(i) {

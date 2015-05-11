@@ -1,7 +1,7 @@
 <html>
 <head>
-<script src="lottaground.js"></script>
-<script src="jquery-1.11.2.min.js"></script>
+<script src="../lottaground.js"></script>
+<script src="../jquery-1.11.2.min.js"></script>
 <script>
 $(document).ready(function() {
     var bgcanvas = document.getElementById('bg-canvas');
@@ -16,6 +16,9 @@ $(document).ready(function() {
         {waterlevel: 380, ground: '#b04c4c', watercolor: '#b9e4a2'}
     );
     ground.shift(100);
+
+    mountains.render();
+    ground.render();
 
     var ff = false;
     var rw = false;

@@ -1,0 +1,69 @@
+<html>
+<head>
+<script src="../lottaground.js"></script>
+<script src="../jquery-1.11.2.min.js"></script>
+<script>
+$(document).ready(function() {
+    var bgcanvas = document.getElementById('bg-canvas');
+    var canvas = document.getElementById('lottaground-canvas');
+
+    var ceiling = lottaground(
+        bgcanvas,
+        {smoothness: 0.02, background: '#522', ground: '#211'}
+    );
+    var ground = lottaground(
+        canvas,
+        {smoothness: 0.05, waterlevel: 450, ground: '#522', watercolor: '#badbd3'}
+    );
+    ceiling.shift(-180);
+    ground.shift(180);
+
+    ceiling.render();
+    ground.render();
+
+    var ff = false;
+    var rw = false;
+    $(document)
+        .keydown(function(evt) {
+            if (evt.which === 39) { // right arrow
+                ff = true;
+                rw = false;
+            } else if (evt.which === 37) {
+                ff = false;
+                rw = true;
+            } else if (evt.which === 82) { // 'r'
+                ground.roughen();
+            }
+        })
+        .keyup(function(evt) {
+            if (evt.which === 39 ||evt.which === 37) {
+                ff = rw = false;
+            }
+        });
+
+    requestAnimationFrame(frame);
+    function frame() {
+        if (ff) {
+            ceiling.fastforward(0.01);
+            ground.fastforward(0.01);
+        } else if (rw) {
+            ceiling.rewind(0.01);
+            ground.rewind(0.01);
+        }
+        requestAnimationFrame(frame);
+    }
+});
+</script>
+<style>
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas" width="1000" height="500"></canvas>
+<canvas id="lottaground-canvas" width="1000" height="500"></canvas>
+</body>
+</html>

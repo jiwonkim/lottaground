@@ -23,9 +23,8 @@ ground.shift(50);
 
 ## Settings
 
-|---------|------|---------|-------------|
 | setting | type | default | description |
-|=========|======|=========|=============|
+|---------|------|---------|-------------|
 | `numSamples` | `int` | `1000` | terrain's resolution - height is computed at each sample |
 | `persistence` | `float` | `0.25` | variable to Perlin noise |
 | `octaves` | `int` | `32` | variable to Perlin noise |
